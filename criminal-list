@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Criminal List - Criminal Face Detector</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card {
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #343a40;
+            color: white;
+        }
+        .btn-dark {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">Criminal Face Detector</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/#addCriminal">Add Criminal</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/#detectCriminal">Detect Criminal</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/criminal-list">Criminal List</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-3">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <span th:text="${success}"></span>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <span th:text="${error}"></span>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Criminal List</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Photo</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Crime Details</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="criminal : ${criminals}">
+                            <td th:text="${criminal.id}"></td>
+                            <td>
+                                <img th:if="${criminal.photoPath}" th:src="@{'/images/' + ${criminal.photoPath}}"
+                                    alt="Criminal Photo" style="max-width: 100px;">
+                            </td>
+                            <td th:text="${criminal.name}"></td>
+                            <td th:text="${criminal.age}"></td>
+                            <td th:text="${criminal.gender}"></td>
+                            <td th:text="${criminal.crimeDetails}"></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" th:onclick="'editCriminal(' + ${criminal.id} + ')'">Edit</button>
+                                <button class="btn btn-sm btn-danger" th:onclick="'deleteCriminal(' + ${criminal.id} + ')'">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function editCriminal(id) {
+            window.location.href = '/#addCriminal?id=' + id;
+        }
+
+        function deleteCriminal(id) {
+            if (confirm('Are you sure you want to delete this criminal record?')) {
+                fetch('/deleteCriminal/' + id, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting criminal record');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting criminal record');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
